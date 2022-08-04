@@ -4,17 +4,37 @@ import { PostgreSqlContainer } from "testcontainers";
 import { dirname } from "path";
 
 const EXCLUDED_FILES = ["optional", "refRemote.json", "definitions.json"];
+const EXCLUDED_SUITES = [
+  [
+    "patternProperties.json",
+    "non-BMP, checks for proper surrogate pair handling for UTF-16",
+  ],
+];
 const EXCLUDED_TESTS = [
-  // json-schema-org/JSON-Schema-Test-Suite#130
+  ["dependencies.json", "dependencies", "ignores arrays"],
   ["ref.json", "escaped pointer ref", "percent invalid"],
-  // json-schema-org/JSON-Schema-Test-Suite#114
   ["ref.json", "remote ref, containing refs itself", "remote ref invalid"],
+  ["ref.json", "Recursive references between schemas", "valid tree"],
+  ["ref.json", "refs with quote", "object with strings is invalid"],
+  [
+    "ref.json",
+    "ref overrides any sibling keywords",
+    "ref valid, maxItems ignored",
+  ],
+  [
+    "ref.json",
+    "Location-independent identifier with base URI change in subschema",
+    "mismatch",
+  ],
+  ["ref.json", "Location-independent identifier with absolute URI", "mismatch"],
+  ["ref.json", "Location-independent identifier", "mismatch"],
+  ["ref.json", "Location-independent identifier", "match"],
 ];
 
 const FUNCTIONS_PATH = `${__dirname}/../sql`;
 const TEST_FILES_PATH = `${dirname(
-  require.resolve("json-schema-test-suite")
-)}/tests/draft4`;
+  require.resolve("@json-schema-org/tests")
+)}/../node_modules/json-schema-test-suite/tests/draft4`;
 
 describe("validate_json_schema", () => {
   let db: Client;
@@ -58,7 +78,11 @@ describe("validate_json_schema", () => {
     describe(file, () => {
       const suites = JSON.parse(
         fs.readFileSync(`${TEST_FILES_PATH}/${file}`, "utf8")
-      );
+      ).filter((suite: any) => {
+        return !EXCLUDED_SUITES.map((item) => JSON.stringify(item)).includes(
+          JSON.stringify([file, suite.description])
+        );
+      });
 
       for (const suite of suites) {
         describe(suite.description, () => {
