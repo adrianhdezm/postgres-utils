@@ -1,3 +1,84 @@
+CREATE OR REPLACE FUNCTION is_uri(data text) RETURNS boolean AS $f$
+DECLARE
+  pattern text;
+BEGIN
+  pattern := '^(?:[a-z][a-z0-9+\-.]*:)(?:\/?\/(?:(?:[a-z0-9\-._~!$&''()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&''()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&''()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&''()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&''()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&''()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&''()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&''()*+,;=:@]|%[0-9a-f]{2})*)*)(?:\?(?:[a-z0-9\-._~!$&''()*+,;=:@/?]|%[0-9a-f]{2})*)?(?:#(?:[a-z0-9\-._~!$&''()*+,;=:@/?]|%[0-9a-f]{2})*)?$';
+  IF data ~ '\/|:' AND data ~* pattern THEN
+    RETURN true;
+  ELSE
+    RETURN false;
+  END IF;
+END;
+$f$ LANGUAGE 'plpgsql' IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION is_ipv6(data text) RETURNS boolean AS $f$
+DECLARE
+  pattern text;
+BEGIN
+  pattern := '^((([0-9a-f]{1,4}:){7}([0-9a-f]{1,4}|:))|(([0-9a-f]{1,4}:){6}(:[0-9a-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){5}(((:[0-9a-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){4}(((:[0-9a-f]{1,4}){1,3})|((:[0-9a-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){3}(((:[0-9a-f]{1,4}){1,4})|((:[0-9a-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){2}(((:[0-9a-f]{1,4}){1,5})|((:[0-9a-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){1}(((:[0-9a-f]{1,4}){1,6})|((:[0-9a-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9a-f]{1,4}){1,7})|((:[0-9a-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))$';
+  IF data ~ pattern THEN
+    RETURN true;
+  ELSE
+    RETURN false;
+  END IF;
+END;
+$f$ LANGUAGE 'plpgsql' IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION is_ipv4(data text) RETURNS boolean AS $f$
+DECLARE
+  pattern text;
+BEGIN
+  pattern := '^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$';
+  IF data ~ pattern THEN
+    RETURN true;
+  ELSE
+    RETURN false;
+  END IF;
+END;
+$f$ LANGUAGE 'plpgsql' IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION is_hostname(data text) RETURNS boolean AS $f$
+DECLARE
+  pattern text;
+BEGIN
+  pattern := '^(?=.{1,253}\.?$)[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[-0-9a-z]{0,61}[0-9a-z])?)*\.?$';
+  IF data ~ pattern THEN
+    RETURN true;
+  ELSE
+    RETURN false;
+  END IF;
+END;
+$f$ LANGUAGE 'plpgsql' IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION is_email(data text) RETURNS boolean AS $f$
+DECLARE
+  pattern text;
+BEGIN
+  pattern := '^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$';
+  IF data ~ pattern THEN
+    RETURN true;
+  ELSE
+    RETURN false;
+  END IF;
+END;
+$f$ LANGUAGE 'plpgsql' IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION is_date_time(data text) RETURNS boolean AS $f$
+DECLARE
+  pattern text;
+BEGIN
+  PERFORM data::date;
+  pattern := '^([0-9]{4})-([0-9]{2})-([0-9]{2})([Tt]([0-9]{2}):([0-9]{2}):(\d+(?:[\.\,]\d{1,20})?)(\\.[0-9]+)?)?(([Zz]|([+-])([0-9]{2}):([0-9]{2})))?$';
+  IF data ~ pattern THEN
+    RETURN true;
+  ELSE
+    RETURN false;
+  END IF;
+EXCEPTION WHEN OTHERS THEN
+  RETURN false;
+END;
+$f$ LANGUAGE 'plpgsql' IMMUTABLE;
+
 CREATE OR REPLACE FUNCTION validate_json_schema_type(type text, data jsonb) RETURNS boolean AS $f$
 BEGIN
   IF type = 'integer' THEN
@@ -5,6 +86,9 @@ BEGIN
       RETURN false;
     END IF;
     IF trunc(data::text::numeric) != data::text::numeric THEN
+      RETURN false;
+    END IF;
+    IF data::text ~ '^[+-]?\d+\.\d+$' THEN
       RETURN false;
     END IF;
   ELSE
@@ -234,6 +318,25 @@ BEGIN
   IF schema ? 'pattern' AND jsonb_typeof(data) = 'string' THEN
     IF (data #>> '{}') !~ (schema->>'pattern') THEN
       RETURN false;
+    END IF;
+  END IF;
+
+  IF schema ? 'format' AND jsonb_typeof(data) = 'string' THEN
+    IF schema->>'format' = 'date-time' THEN
+      RETURN is_date_time(data #>> '{}');
+    ELSIF schema->>'format' = 'email' THEN
+      RETURN is_email(data #>> '{}');
+    ELSIF schema->>'format' = 'hostname' THEN
+      RETURN is_hostname(data #>> '{}');
+    ELSIF schema->>'format' = 'ipv4' THEN
+      RETURN is_ipv4(data #>> '{}');
+    ELSIF schema->>'format' = 'ipv6' THEN
+      RETURN is_ipv6(data #>> '{}');
+    ELSIF schema->>'format' = 'uri' THEN
+      RETURN is_uri(data #>> '{}');
+    ELSE
+    -- allowed unknown format is valid
+      RETURN true;
     END IF;
   END IF;
 

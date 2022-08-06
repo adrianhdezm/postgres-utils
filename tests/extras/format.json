@@ -1,0 +1,165 @@
+[
+  {
+    "description": "allowed unknown format is valid",
+    "schema": { "format": "allowedUnknown" },
+    "tests": [
+      {
+        "description": "any string is valid",
+        "data": "any value",
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "validation of date-time strings",
+    "schema": { "format": "date-time" },
+    "tests": [
+      {
+        "description": "a valid date-time string: 2016-01-19T15:21:32.59+02:00",
+        "data": "2016-01-19T15:21:32.59+02:00",
+        "valid": true
+      },
+      {
+        "description": "a valid date-time string: 1985-04-12T23:20:50.52Z",
+        "data": "1985-04-12T23:20:50.52Z",
+        "valid": true
+      },
+      {
+        "description": "a valid date-time string: 1996-12-19T16:39:57-08:00",
+        "data": "1996-12-19T16:39:57-08:00",
+        "valid": true
+      },
+      {
+        "description": "a valid date-time string: 1990-12-31T23:59:60Z",
+        "data": "1990-12-31T23:59:60Z",
+        "valid": true
+      },
+      {
+        "description": "a valid date-time string: 1990-12-31T15:59:60-08:00",
+        "data": "1990-12-31T15:59:60-08:00",
+        "valid": true
+      },
+      {
+        "description": "a valid date-time string: 1937-01-01T12:00:27.87+00:20",
+        "data": "1937-01-01T12:00:27.87+00:20",
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "validation of e-mail addresses",
+    "schema": { "format": "email" },
+    "tests": [
+      {
+        "description": "a valid e-mail address: simple@example.com",
+        "data": "simple@example.com",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: very.common@example.com",
+        "data": "very.common@example.com",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: disposable.style.email.with+symbol@example.com",
+        "data": "disposable.style.email.with+symbol@example.com",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: other.email-with-hyphen@example.com",
+        "data": "other.email-with-hyphen@example.com",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: fully-qualified-domain@example.com",
+        "data": "fully-qualified-domain@example.com",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: user.name+tag+sorting@example.com",
+        "data": "user.name+tag+sorting@example.com",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: x@example.com",
+        "data": "x@example.com",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: example-indeed@strange-example.com",
+        "data": "example-indeed@strange-example.com",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: test/test@test.com",
+        "data": "test/test@test.com",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: admin@mailserver1",
+        "data": "admin@mailserver1",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: example@s.example",
+        "data": "example@s.example",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: mailhost!username@example.org",
+        "data": "mailhost!username@example.org",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: user-@example.org",
+        "data": "user-@example.org",
+        "valid": true
+      },
+      {
+        "description": "a valid e-mail address: user%example.com@example.org",
+        "data": "user%example.com@example.org",
+        "valid": true
+      },
+      {
+        "description": "an invalid e-mail address: Abc.example.com",
+        "data": "Abc.example.com",
+        "valid": false
+      },
+      {
+        "description": "an invalid e-mail address: A@b@c@example.com",
+        "data": "A@b@c@example.com",
+        "valid": false
+      },
+      {
+        "description": "an invalid e-mail address: a\"b(c)d,e:f;g<h>i[j\\k]l@example.com",
+        "data": "a\"b(c)d,e:f;g<h>i[j\\k]l@example.com",
+        "valid": false
+      },
+      {
+        "description": "an invalid e-mail address: just\"not\"right@example.com",
+        "data": "just\"not\"right@example.com",
+        "valid": false
+      },
+      {
+        "description": "an invalid e-mail address: this is\"not\\allowed@example.com",
+        "data": "this is\"not\\allowed@example.com",
+        "valid": false
+      },
+      {
+        "description": "an invalid e-mail address: this\\ still\\\"not\\\\allowed@example.com",
+        "data": "this\\ still\\\"not\\\\allowed@example.com",
+        "valid": false
+      },
+      {
+        "description": "an invalid e-mail address: i_like_underscore@but_its_not_allowed_in_this_part.example.com",
+        "data": "i_like_underscore@but_its_not_allowed_in_this_part.example.com",
+        "valid": false
+      },
+      {
+        "description": "an invalid e-mail address: QA[icon]CHOCOLATE[icon]@test.com",
+        "data": "QA[icon]CHOCOLATE[icon]@test.com",
+        "valid": false
+      }
+    ]
+  }
+]

@@ -3,11 +3,23 @@ import fs from "fs";
 import { PostgreSqlContainer } from "testcontainers";
 import { dirname } from "path";
 
-const EXCLUDED_FILES = ["optional", "refRemote.json", "definitions.json"];
+const EXCLUDED_FILES = [
+  "optional",
+  "refRemote.json",
+  "definitions.json",
+  "zeroTerminatedFloats.json",
+];
 const EXCLUDED_SUITES = [
   [
     "patternProperties.json",
     "non-BMP, checks for proper surrogate pair handling for UTF-16",
+  ],
+  ["ecmascript-regex.json", "ECMA 262 regex non-compliance"],
+  ["ecmascript-regex.json", "ECMA 262 \\d matches ascii digits only"],
+  ["ecmascript-regex.json", "ECMA 262 \\w matches ascii letters only"],
+  [
+    "ecmascript-regex.json",
+    "ECMA 262 \\w matches everything but ascii letters",
   ],
 ];
 const EXCLUDED_TESTS = [
@@ -72,17 +84,31 @@ describe("validate_json_schema", () => {
   // Iterate schema validation files
   const files = fs
     .readdirSync(TEST_FILES_PATH)
-    .filter((file) => !EXCLUDED_FILES.includes(file));
+    .filter((file) => !EXCLUDED_FILES.includes(file))
+    .map((file) => ({ name: file, path: `${TEST_FILES_PATH}/${file}` }));
 
-  for (const file of files) {
-    describe(file, () => {
-      const suites = JSON.parse(
-        fs.readFileSync(`${TEST_FILES_PATH}/${file}`, "utf8")
-      ).filter((suite: any) => {
-        return !EXCLUDED_SUITES.map((item) => JSON.stringify(item)).includes(
-          JSON.stringify([file, suite.description])
-        );
-      });
+  const optionalFiles = fs
+    .readdirSync(`${TEST_FILES_PATH}/optional`)
+    .filter((file) => !EXCLUDED_FILES.includes(file))
+    .map((file) => ({
+      name: file,
+      path: `${TEST_FILES_PATH}/optional/${file}`,
+    }));
+
+  const extraFiles = fs.readdirSync(`${__dirname}/extras`).map((file) => ({
+    name: file,
+    path: `${__dirname}/extras/${file}`,
+  }));
+
+  for (const file of [...files, ...optionalFiles, ...extraFiles]) {
+    describe(file.name, () => {
+      const suites = JSON.parse(fs.readFileSync(file.path, "utf8")).filter(
+        (suite: any) => {
+          return !EXCLUDED_SUITES.map((item) => JSON.stringify(item)).includes(
+            JSON.stringify([file.name, suite.description])
+          );
+        }
+      );
 
       for (const suite of suites) {
         describe(suite.description, () => {
@@ -90,7 +116,7 @@ describe("validate_json_schema", () => {
 
           const tests = suite.tests.filter((test: any) => {
             return !EXCLUDED_TESTS.map((item) => JSON.stringify(item)).includes(
-              JSON.stringify([file, suite.description, test.description])
+              JSON.stringify([file.name, suite.description, test.description])
             );
           });
 
