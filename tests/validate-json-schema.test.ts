@@ -23,7 +23,6 @@ const EXCLUDED_SUITES = [
   ],
 ];
 const EXCLUDED_TESTS = [
-  ["dependencies.json", "dependencies", "ignores arrays"],
   ["ref.json", "escaped pointer ref", "percent invalid"],
   ["ref.json", "remote ref, containing refs itself", "remote ref invalid"],
   ["ref.json", "Recursive references between schemas", "valid tree"],

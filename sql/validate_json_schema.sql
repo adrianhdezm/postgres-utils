@@ -301,7 +301,7 @@ BEGIN
 
   IF schema ? 'dependencies' THEN
     FOR prop IN SELECT jsonb_object_keys(schema->'dependencies') LOOP
-      IF data ? prop THEN
+      IF data ? prop AND jsonb_typeof(data) != 'array' THEN
         IF jsonb_typeof(schema->'dependencies'->prop) = 'array' THEN
           IF NOT (SELECT bool_and(data ? dep) FROM jsonb_array_elements_text(schema->'dependencies'->prop) dep) THEN
             RETURN false;
